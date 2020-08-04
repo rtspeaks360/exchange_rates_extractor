@@ -2,16 +2,21 @@
 # @Author: rish
 # @Date:   2020-08-02 23:03:47
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-04 21:16:45
+# @Last Modified time: 2020-08-04 22:16:58
 
 ### Imports START
 import logging
 import sys
 import requests
 import pandas as pd
+import numpy as np
 from datetime import datetime, date, timedelta
 from queue import Queue
 from threading import Thread
+from sqlalchemy.dialects import mysql
+from sqlalchemy import exc
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 import config
 from er_extractor import models
@@ -19,6 +24,11 @@ from er_extractor import models
 
 
 logger = logging.getLogger(__name__)
+
+engine = create_engine(config.DB_CONN_STRING)
+models.Base.metadata.bind = engine
+
+DBSession = sessionmaker(bind=engine)
 
 
 
@@ -135,7 +145,7 @@ def _api_request(date):
 	logger.info(config.EXCHANGE_RATES_API_URL.format(date=date))
 	req = requests.get(config.EXCHANGE_RATES_API_URL.format(date=date))
 	req_json = req.json()
-	req_json['status_code'] = req.status_code
+	req_json['request_status'] = req.status_code
 
 	return req_json
 # [END]
@@ -199,5 +209,28 @@ def extract_data(
 def persist_data(df):
 	'''
 	'''
-	pass
+	session = DBSession()
+
+	df.fillna(value=np.nan, inplace=True)
+	df.replace({np.nan: None}, inplace=True)
+	df.drop_duplicates(subset=['date'], inplace=True)
+	df.sort_values(by='date', inplace=True)
+
+	insert_stmt = (
+		mysql
+		.insert(models.ExchangeRate.__table__)
+		.values(df.to_dict(orient='records'))
+	)
+
+	try:
+		session.execute(insert_stmt)
+		session.commit()
+	except exc.SQLAlchemyError as e:
+		logger.error('Session commit failed.')
+		logger.error(e._message)
+		session.rollback()
+
+	session.close()
+
+	return
 # [END]

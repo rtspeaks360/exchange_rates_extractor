@@ -2,7 +2,7 @@
 # @Author: rish
 # @Date:   2020-08-02 23:09:08
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-04 21:40:30
+# @Last Modified time: 2020-08-04 22:05:26
 
 
 ### Imports START
@@ -10,7 +10,7 @@ import logging
 from sqlalchemy import create_engine, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, BigInteger, Integer, DateTime, Date,\
-	JSON, Numeric
+	JSON, Float
 from sqlalchemy.sql import func
 ### Imports END
 
@@ -36,14 +36,14 @@ class ExchangeRate(Base):
 	date = Column(Date, nullable=False, unique=True)
 	base = Column(String(3), nullable=False)
 
-	USD = Column(Numeric)
-	CAD = Column(Numeric)
-	INR = Column(Numeric)
-	SGD = Column(Numeric)
-	RUB = Column(Numeric)
-	CZK = Column(Numeric)
-	ISK = Column(Numeric)
-	HKD = Column(Numeric)
+	USD = Column(Float)
+	CAD = Column(Float)
+	INR = Column(Float)
+	SGD = Column(Float)
+	RUB = Column(Float)
+	CZK = Column(Float)
+	ISK = Column(Float)
+	HKD = Column(Float)
 
 	rates_payload = Column(JSON, nullable=False)
 	request_status = Column(Integer, nullable=False)
