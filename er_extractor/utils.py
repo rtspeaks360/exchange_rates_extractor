@@ -2,12 +2,16 @@
 # @Author: rish
 # @Date:   2020-08-02 23:03:47
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-04 14:29:04
+# @Last Modified time: 2020-08-04 21:16:45
 
 ### Imports START
 import logging
 import sys
+import requests
+import pandas as pd
 from datetime import datetime, date, timedelta
+from queue import Queue
+from threading import Thread
 
 import config
 from er_extractor import models
@@ -15,6 +19,7 @@ from er_extractor import models
 
 
 logger = logging.getLogger(__name__)
+
 
 
 # [START Function to get dates alreday recorded]
@@ -105,11 +110,93 @@ def collect_request_dates(mode, start_date, end_date):
 	return dates
 # [END]
 
+# [START Worker class that defines what each worker needs to do]
+class APIExtractionWorker(Thread):
 
-# [START Function to make the network requests]
-def get_data_from_api(
-	urls, multithreading, multithreading_after, num_threads
+	def __init__(self, queue):
+		Thread.__init__(self)
+		self.queue = queue
+
+	def run(self):
+		while True:
+			# Get the work from the queue and expand the tuple
+			results_list, date = self.queue.get()
+			try:
+				results_list.append(_api_request(date))
+			finally:
+				self.queue.task_done()
+# [END]
+
+
+# [START Function to make API request]
+def _api_request(date):
+	'''
+	'''
+	logger.info(config.EXCHANGE_RATES_API_URL.format(date=date))
+	req = requests.get(config.EXCHANGE_RATES_API_URL.format(date=date))
+	req_json = req.json()
+	req_json['status_code'] = req.status_code
+
+	return req_json
+# [END]
+
+
+# [START Function to collect data from the api]
+def _get_data_from_api(
+	dates, multithreading, multithreading_after, num_threads
 ):
+	'''
+	'''
+	results = []
+
+	if multithreading and len(dates) > multithreading_after:
+		logger.info('Setting up multithreading')
+		queue = Queue()
+		for _ in range(num_threads):
+			worker = APIExtractionWorker(queue)
+			worker.daemon = True
+			worker.start()
+		for _d in dates:
+			queue.put((results, _d))
+		queue.join()
+		logger.info(len(results))
+
+	else:
+		for _d in dates:
+			results.append(_api_request(_d))
+
+	return results
+# [END]
+
+
+# [START Function to get the required results frame]
+def extract_data(
+	dates, multithreading, multithreading_after, num_threads
+):
+	'''
+	'''
+	# Collect data
+	results = _get_data_from_api(
+		dates, multithreading,
+		multithreading_after, num_threads
+	)
+
+	# process collected data
+	df = pd.DataFrame(results)
+	rates_df = pd.DataFrame(df.rates.to_list())
+	rates_df = rates_df[config.CURRENCY_MARKERS]
+	df = pd.concat([df, rates_df], axis=1)
+	df.rename(columns={'rates': 'rates_payload'}, inplace=True)
+
+	logger.info(df.columns)
+	logger.info(df.shape)
+
+	return df
+# [END]
+
+
+# [START Function to persist data into the database]
+def persist_data(df):
 	'''
 	'''
 	pass

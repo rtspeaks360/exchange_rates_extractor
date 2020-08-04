@@ -2,7 +2,7 @@
 # @Author: rish
 # @Date:   2020-08-04 00:17:31
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-04 14:30:08
+# @Last Modified time: 2020-08-04 20:50:21
 
 ### Imports START
 import argparse
@@ -69,7 +69,7 @@ def parser_args():
 	)
 
 	parser.add_argument(
-		'--multithreading_after', dest='multithreading_after', type=int, default=10,
+		'--multithreading_after', dest='multithreading_after', type=int, default=5,
 		help='Use this argument to specifiy after how many requests should\
 		multithreading be enabled.'
 	)

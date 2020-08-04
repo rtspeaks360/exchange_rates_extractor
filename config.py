@@ -2,7 +2,7 @@
 # @Author: rish
 # @Date:   2020-08-04 00:17:37
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-04 14:34:32
+# @Last Modified time: 2020-08-04 21:31:16
 
 
 ### Imports START
@@ -15,6 +15,7 @@ DATE_LOWER_BOUND = '2000-01-01'
 DATE_UPPER_BOUND = datetime.date.today().strftime(DATE_FORMAT)
 LATEST_LOWER_BOUND = 7
 EXCHANGE_RATES_API_URL = 'https://api.exchangeratesapi.io/{date}'
+CURRENCY_MARKERS = ['USD', 'CAD', 'INR', 'SGD', 'RUB', 'CZK', 'ISK', 'HKD']
 
 if os.environ.keys().__contains__('ENV-INDICATOR') \
 	and os.environ['ENV-INDICATOR'] == 'PROD':
@@ -33,7 +34,7 @@ else:
 	BASE_PATH = ''
 
 	USER_NAME = 'rish'
-	PASSWORD = ''
+	PASSWORD = 'password'
 	HOST = 'localhost'
 	PORT = '5432'
 	DATABASE = 'pd_exchangerates'
