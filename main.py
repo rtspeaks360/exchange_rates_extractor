@@ -2,7 +2,7 @@
 # @Author: rish
 # @Date:   2020-08-04 00:16:57
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-04 14:31:48
+# @Last Modified time: 2020-08-05 00:59:51
 
 ### Imports START
 import os
@@ -61,6 +61,9 @@ def main(args):
 	'''
 
 	if args.run_as == 'extractor':
+		logger.info('Running application as extractor process')
+		logger.info('')
+
 		er_extractor.get_exchange_rates(
 			args.get_data_by, args.start_date, args.end_date,
 			args.num_of_threads, args.multithreading,

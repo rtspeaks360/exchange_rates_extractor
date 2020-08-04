@@ -2,7 +2,7 @@
 # @Author: rish
 # @Date:   2020-08-02 23:03:47
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-05 00:57:16
+# @Last Modified time: 2020-08-05 01:49:08
 
 ### Imports START
 import logging
@@ -42,7 +42,6 @@ def _get_recorded_dates():
 	if len(query) > 0:
 		for _ in query:
 			dates.append(str(_.date))
-		logger.info(dates)
 	return dates
 # [END]
 
@@ -102,8 +101,6 @@ def collect_request_dates(mode, start_date, end_date):
 		- start_date
 		- end_date
 	'''
-	logger.info('collecting request urls')
-
 	start_date_parsed, end_date_parsed = _get_edges_for_interval(
 		mode, start_date, end_date
 	)
@@ -124,6 +121,7 @@ def collect_request_dates(mode, start_date, end_date):
 
 	# Exclude already recorded dates
 	dates = list(set(dates) - set(dates_from_db))
+	dates = [str(_) for _ in dates]
 	return dates
 # [END]
 
@@ -149,7 +147,6 @@ class APIExtractionWorker(Thread):
 def _api_request(date):
 	'''
 	'''
-	logger.info(config.EXCHANGE_RATES_API_URL.format(date=date))
 	req = requests.get(config.EXCHANGE_RATES_API_URL.format(date=date))
 	req_json = req.json()
 	req_json['request_status'] = req.status_code
@@ -167,21 +164,36 @@ def _get_data_from_api(
 	results = []
 
 	if multithreading and len(dates) > multithreading_after:
-		logger.info('Setting up multithreading')
+		logger.info(
+			'Setting up multithreading with {} threads'
+			.format(num_threads)
+		)
 		queue = Queue()
+
+		# Intialize worker threads
 		for _ in range(num_threads):
 			worker = APIExtractionWorker(queue)
 			worker.daemon = True
 			worker.start()
-		for _d in dates:
-			queue.put((results, _d))
-		queue.join()
-		logger.info(len(results))
 
+		# Queue dates
+		for _d in dates:
+			logger.info(
+				'Queing URL - {}'
+				.format(
+					config.EXCHANGE_RATES_API_URL
+					.format(date=_d)
+				)
+			)
+			queue.put((results, _d))
+		# Waiting for all workers to finish
+		queue.join()
 	else:
+		logger.info('Getting results...')
 		for _d in dates:
 			results.append(_api_request(_d))
-
+		logger.info('Use multithreading for better performance.')
+	logger.info('')
 	return results
 # [END]
 
@@ -197,30 +209,42 @@ def extract_data(
 		dates, multithreading,
 		multithreading_after, num_threads
 	)
+	logger.info('Total responses: {}'.format(len(results)))
 
 	# process collected data
 	df = pd.DataFrame(results)
 	rates_df = pd.DataFrame(df.rates.to_list())
+	_cols = (set(config.CURRENCY_MARKERS) - set(rates_df.columns))
+
+	for _ in _cols:
+		rates_df[_] = np.nan
+
 	rates_df = rates_df[config.CURRENCY_MARKERS]
 	df = pd.concat([df, rates_df], axis=1)
 	df.rename(columns={'rates': 'rates_payload'}, inplace=True)
 
 	# For dates that did not get a response
 	df.drop_duplicates(subset=['date'], inplace=True)
+	logger.info(
+		'{} unique data points for exchange rates fetched'
+		.format(df.shape[0])
+	)
+
+	# Check for dates not found
 	dates_nf = list(set(dates) - set(df.date.to_list()))
+
 	if len(dates_nf) > 0:
+		logger.info(
+			'{} dates in range for which no data was found'
+			.format(len(dates_nf))
+		)
 		temp_df = pd.DataFrame(
 			[[_, 404, 'EUR'] for _ in dates_nf],
 			columns=['date', 'request_status', 'base']
 		)
 		df = df.append(temp_df, sort=False)
 		df = df.loc[~df.date.isin(_get_recorded_dates())]
-	
 	df.sort_values(by='date', inplace=True)
-
-	logger.info(df.columns)
-	logger.info(df.shape)
-
 	return df
 # [END]
 
@@ -243,6 +267,7 @@ def persist_data(df):
 	try:
 		session.execute(insert_stmt)
 		session.commit()
+		logger.info('Added {} rows in database'.format(df.shape[0]))
 	except exc.SQLAlchemyError as e:
 		logger.error('Session commit failed.')
 		logger.error(e._message)
