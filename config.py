@@ -2,7 +2,7 @@
 # @Author: rish
 # @Date:   2020-08-04 00:17:37
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-04 04:59:01
+# @Last Modified time: 2020-08-04 14:34:32
 
 
 ### Imports START
@@ -20,10 +20,28 @@ if os.environ.keys().__contains__('ENV-INDICATOR') \
 	and os.environ['ENV-INDICATOR'] == 'PROD':
 	# Environment string
 	env_str = 'PROD'
-	DB_CONN_STRING = ''
 	BASE_PATH = os.environ['SCPATH']
+
+	USER_NAME = ''
+	PASSWORD = ''
+	HOST = ''
+	PORT = ''
+	DATABASE = 'pd_exchangerates'
 else:
 	# Environment string
 	env_str = 'DEV'
-	DB_CONN_STRING = 'mysql+mysqlconnector://rish@localhost/pd_exchangerates'
 	BASE_PATH = ''
+
+	USER_NAME = 'rish'
+	PASSWORD = ''
+	HOST = 'localhost'
+	PORT = '5432'
+	DATABASE = 'pd_exchangerates'
+
+DB_CONN_STRING = 'postgres+psycopg2://{uname}:{pwd}@{host}:{port}/{db}'.format(
+	uname=USER_NAME, pwd=PASSWORD, host=HOST, port=PORT, db=DATABASE
+)
+PG_DB_CONN_STRING = "dbname='{db}' user='{uname}' host='{host}' \
+password='{pwd}' port={port}".format(
+	uname=USER_NAME, pwd=PASSWORD, host=HOST, port=PORT, db=DATABASE
+)

@@ -2,7 +2,7 @@
 # @Author: rish
 # @Date:   2020-08-04 00:17:31
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-04 03:10:32
+# @Last Modified time: 2020-08-04 14:30:08
 
 ### Imports START
 import argparse
@@ -93,6 +93,11 @@ def parser_args():
 		'--env', choices=['dev', 'prod'], default='dev',
 		help='Use this argument to specify whether the processes are to be run in a\
 		development environment or production.'
+	)
+
+	parser.add_argument(
+		'--initialize_db', dest='initdb', action='store_true',
+		help='Use this argument to initialize the database tables.'
 	)
 
 	# Parsing the arguments received

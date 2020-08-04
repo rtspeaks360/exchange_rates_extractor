@@ -2,7 +2,7 @@
 # @Author: rish
 # @Date:   2020-08-02 23:03:47
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-04 04:21:29
+# @Last Modified time: 2020-08-04 14:29:04
 
 ### Imports START
 import logging
@@ -10,6 +10,7 @@ import sys
 from datetime import datetime, date, timedelta
 
 import config
+from er_extractor import models
 ### Imports END
 
 

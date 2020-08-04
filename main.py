@@ -2,7 +2,7 @@
 # @Author: rish
 # @Date:   2020-08-04 00:16:57
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-04 04:02:07
+# @Last Modified time: 2020-08-04 14:31:48
 
 ### Imports START
 import os
@@ -10,6 +10,7 @@ import sys
 import time
 import logging
 
+import config
 import parser
 ### Imports END
 
@@ -67,6 +68,8 @@ def main(args):
 		)
 	elif args.run_as == 'dashboard':
 		pass
+	elif args.initdb:
+		er_extractor.utils.models.convert_classes_into_tables(config.DB_CONN_STRING)
 	else:
 		logger.warning('Invalid `run_as` argument.')
 

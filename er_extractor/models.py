@@ -2,10 +2,11 @@
 # @Author: rish
 # @Date:   2020-08-02 23:09:08
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-04 05:07:12
+# @Last Modified time: 2020-08-04 14:33:07
 
 
 ### Imports START
+import logging
 from sqlalchemy import create_engine, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, BigInteger, Integer, DateTime, Date,\
@@ -13,6 +14,7 @@ from sqlalchemy import Column, String, BigInteger, Integer, DateTime, Date,\
 from sqlalchemy.sql import func
 ### Imports END
 
+logger = logging.getLogger(__name__)
 
 # Object for the delcaratove base class
 Base = declarative_base()
@@ -74,7 +76,7 @@ def convert_classes_into_tables(connection_string):
 
 	engine = create_engine(connection_string)
 	Base.metadata.create_all(engine)
-	print('created_tables')
+	logger.info('created_tables')
 	return
 # [END]
 
