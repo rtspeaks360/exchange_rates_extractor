@@ -2,7 +2,7 @@
 # @Author: rish
 # @Date:   2020-08-04 00:17:37
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-04 21:31:16
+# @Last Modified time: 2020-08-04 21:38:28
 
 
 ### Imports START
@@ -36,12 +36,16 @@ else:
 	USER_NAME = 'rish'
 	PASSWORD = 'password'
 	HOST = 'localhost'
-	PORT = '5432'
+	PORT = 3306
 	DATABASE = 'pd_exchangerates'
 
-DB_CONN_STRING = 'postgres+psycopg2://{uname}:{pwd}@{host}:{port}/{db}'.format(
-	uname=USER_NAME, pwd=PASSWORD, host=HOST, port=PORT, db=DATABASE
+DB_CONN_STRING = (
+	'mysql+mysqlconnector://{uname}:{pwd}@{host}:{port}/{db}'
+	.format(
+		uname=USER_NAME, pwd=PASSWORD, host=HOST, port=PORT, db=DATABASE
+	)
 )
+
 PG_DB_CONN_STRING = "dbname='{db}' user='{uname}' host='{host}' \
 password='{pwd}' port={port}".format(
 	uname=USER_NAME, pwd=PASSWORD, host=HOST, port=PORT, db=DATABASE

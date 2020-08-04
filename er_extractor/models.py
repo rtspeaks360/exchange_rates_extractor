@@ -2,7 +2,7 @@
 # @Author: rish
 # @Date:   2020-08-02 23:09:08
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-04 14:33:07
+# @Last Modified time: 2020-08-04 21:40:30
 
 
 ### Imports START
@@ -34,7 +34,7 @@ class ExchangeRate(Base):
 	_id = Column(BigInteger, primary_key=True)
 
 	date = Column(Date, nullable=False, unique=True)
-	base = Column(String, nullable=False)
+	base = Column(String(3), nullable=False)
 
 	USD = Column(Numeric)
 	CAD = Column(Numeric)
