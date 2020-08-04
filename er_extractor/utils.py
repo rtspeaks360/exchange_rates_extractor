@@ -2,7 +2,7 @@
 # @Author: rish
 # @Date:   2020-08-02 23:03:47
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-04 22:16:58
+# @Last Modified time: 2020-08-05 00:57:16
 
 ### Imports START
 import logging
@@ -31,12 +31,19 @@ models.Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 
 
-
 # [START Function to get dates alreday recorded]
 def _get_recorded_dates():
 	'''
 	'''
-	return []
+	session = DBSession()
+	query = session.query(models.ExchangeRate).all()
+	dates = []
+
+	if len(query) > 0:
+		for _ in query:
+			dates.append(str(_.date))
+		logger.info(dates)
+	return dates
 # [END]
 
 
@@ -110,7 +117,7 @@ def collect_request_dates(mode, start_date, end_date):
 
 	# Create dates for interval
 	delta = end_date_parsed - start_date_parsed
-	print(delta)
+
 	for _ in range(delta.days + 1):
 		day = start_date_parsed + timedelta(days=_)
 		dates.append(day.strftime(config.DATE_FORMAT))
@@ -198,6 +205,19 @@ def extract_data(
 	df = pd.concat([df, rates_df], axis=1)
 	df.rename(columns={'rates': 'rates_payload'}, inplace=True)
 
+	# For dates that did not get a response
+	df.drop_duplicates(subset=['date'], inplace=True)
+	dates_nf = list(set(dates) - set(df.date.to_list()))
+	if len(dates_nf) > 0:
+		temp_df = pd.DataFrame(
+			[[_, 404, 'EUR'] for _ in dates_nf],
+			columns=['date', 'request_status', 'base']
+		)
+		df = df.append(temp_df, sort=False)
+		df = df.loc[~df.date.isin(_get_recorded_dates())]
+	
+	df.sort_values(by='date', inplace=True)
+
 	logger.info(df.columns)
 	logger.info(df.shape)
 
@@ -213,8 +233,6 @@ def persist_data(df):
 
 	df.fillna(value=np.nan, inplace=True)
 	df.replace({np.nan: None}, inplace=True)
-	df.drop_duplicates(subset=['date'], inplace=True)
-	df.sort_values(by='date', inplace=True)
 
 	insert_stmt = (
 		mysql
