@@ -2,7 +2,7 @@
 # @Author: rish
 # @Date:   2020-08-04 00:17:31
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-04 01:12:40
+# @Last Modified time: 2020-08-04 03:10:32
 
 ### Imports START
 import argparse
@@ -39,13 +39,13 @@ def parser_args():
 
 	parser.add_argument(
 		'--get_data_by', dest='get_data_by', default='exhaustive',
-		choices=['specific_date', 'specific_date_range', 'latest', 'exhaustive'],
+		choices=['date', 'date_range', 'latest', 'exhaustive'],
 		help='Use this subargument for extractor to\
 		specify the criteria for the data retrieval'
 	)
 
 	parser.add_argument(
-		'--start_date', dest='start_date', default='2000-01-01',
+		'--start_date', dest='start_date', default=None,
 		help='Use this extractor argument to specifiy the start date\
 		for the interval for which the data needs to be fetched. The date \
 		specified should be greater than equal to 2000-01-01, and must be\
@@ -53,7 +53,7 @@ def parser_args():
 	)
 
 	parser.add_argument(
-		'--end_date', dest='end_date', default=today,
+		'--end_date', dest='end_date', default=None,
 		help='Use this extractor argument to specifiy the end date\
 		for the interval for which the data needs to be fetched. The date\
 		specified should be greater than equal to 2000-01-01, and must be\

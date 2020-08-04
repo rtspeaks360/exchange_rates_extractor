@@ -2,7 +2,7 @@
 # @Author: rish
 # @Date:   2020-08-04 00:16:57
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-04 01:13:25
+# @Last Modified time: 2020-08-04 04:02:07
 
 ### Imports START
 import os
@@ -44,6 +44,9 @@ else:
 	os.environ['ENV-INDICATOR'] = 'DEV'
 
 
+from er_extractor import core as er_extractor
+
+
 # [START Main function for the pipeline]
 def main(args):
 	'''
@@ -57,7 +60,11 @@ def main(args):
 	'''
 
 	if args.run_as == 'extractor':
-		pass
+		er_extractor.get_exchange_rates(
+			args.get_data_by, args.start_date, args.end_date,
+			args.num_of_threads, args.multithreading,
+			args.multithreading_after
+		)
 	elif args.run_as == 'dashboard':
 		pass
 	else:
