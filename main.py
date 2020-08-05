@@ -46,6 +46,7 @@ else:
 
 
 from er_extractor import core as er_extractor
+from er_dashboard.core import app
 
 
 # [START Main function for the pipeline]
@@ -70,7 +71,10 @@ def main(args):
 			args.multithreading_after
 		)
 	elif args.run_as == 'dashboard':
-		pass
+		logging.info('Running application as extractor process')
+		logger.info('')
+
+		app.run(host='127.0.0.1', port=5000)
 	elif args.initdb:
 		er_extractor.utils.models.convert_classes_into_tables(config.DB_CONN_STRING)
 	else:
