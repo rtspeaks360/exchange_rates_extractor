@@ -59,6 +59,13 @@ class ExchangeRate(Base):
 		date, base,
 		name='unique_date_base_exchange_rates'
 	)
+
+	@property
+	def serialize_usd_rate(self):
+		return {
+			'date': str(self.date),
+			'usd': self.USD
+		}
 # [END]
 
 

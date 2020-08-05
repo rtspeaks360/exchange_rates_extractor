@@ -73,7 +73,7 @@ def main(args):
 	elif args.run_as == 'dashboard':
 		logging.info('Running application as extractor process')
 		logger.info('')
-
+		app.debug=True
 		app.run(host='127.0.0.1', port=5000)
 	elif args.initdb:
 		er_extractor.utils.models.convert_classes_into_tables(config.DB_CONN_STRING)

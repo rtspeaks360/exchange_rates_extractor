@@ -1,7 +1,8 @@
 ### Imports START
 import logging
-
 from flask import Flask, render_template
+
+from er_dashboard import utils
 ### Imports END
 
 
@@ -19,4 +20,5 @@ def server_error(e):
 
 @app.route("/")
 def index():
-	return render_template('dashboard.html')
+	graph_data = utils.get_er_csv_string()
+	return render_template('dashboard.html', graph_data=graph_data)
