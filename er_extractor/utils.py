@@ -2,7 +2,7 @@
 # @Author: rish
 # @Date:   2020-08-02 23:03:47
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-05 01:49:08
+# @Last Modified time: 2020-08-05 03:12:37
 
 ### Imports START
 import logging
@@ -23,17 +23,25 @@ from er_extractor import models
 ### Imports END
 
 
+### Global declarations START
 logger = logging.getLogger(__name__)
 
 engine = create_engine(config.DB_CONN_STRING)
 models.Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
+### Global declarations end
+
+
+### Functions to support computation of target dates START
 
 
 # [START Function to get dates alreday recorded]
 def _get_recorded_dates():
 	'''
+	Function to get the dates from the database for which data has already
+	been collected, so that we don't make the same request and persist the
+	same data twice.
 	'''
 	session = DBSession()
 	query = session.query(models.ExchangeRate).all()
@@ -42,14 +50,21 @@ def _get_recorded_dates():
 	if len(query) > 0:
 		for _ in query:
 			dates.append(str(_.date))
+	session.close()
 	return dates
 # [END]
 
 
 # [START Function to get latest start date ]
 def _get_latest_start_date():
-	# Get last recorded date
-	# date = session.query()
+	'''
+	Function to get the start date for fetching the latest data.
+
+	Args:
+		-
+	Returns:
+		- start_date
+	'''
 	today = date.today()
 	limit_date = today - timedelta(days=config.LATEST_LOWER_BOUND)
 	return limit_date.strftime(config.DATE_FORMAT)
@@ -59,6 +74,16 @@ def _get_latest_start_date():
 # [START Function to specify interval edges]
 def _get_edges_for_interval(mode, start_date, end_date):
 	'''
+	Function to specify the interval edges based on on run mode. Based on
+	the edges we get the dates in the interval.
+
+	Args:
+		- mode
+		- start_date
+		- end_date
+	Returns:
+		- start_date_parsed
+		- end_date_parsed
 	'''
 
 	if mode == 'exhaustive':
@@ -100,11 +125,13 @@ def collect_request_dates(mode, start_date, end_date):
 		- mode
 		- start_date
 		- end_date
+	Returns:
+		- list of target dates
 	'''
 	start_date_parsed, end_date_parsed = _get_edges_for_interval(
 		mode, start_date, end_date
 	)
-
+	print(start_date_parsed, end_date_parsed)
 	if mode == 'date':
 		return [start_date_parsed.strftime(config.DATE_FORMAT)]
 
@@ -125,8 +152,18 @@ def collect_request_dates(mode, start_date, end_date):
 	return dates
 # [END]
 
+
+### Functions to support computation of target dates END
+
+### Functions and classes for getting data from API START
+
+
 # [START Worker class that defines what each worker needs to do]
 class APIExtractionWorker(Thread):
+	'''
+	APIExtractionWorker class that provides the instructions for that each
+	thread needs to execute for every input in the queue.
+	'''
 
 	def __init__(self, queue):
 		Thread.__init__(self)
@@ -146,6 +183,13 @@ class APIExtractionWorker(Thread):
 # [START Function to make API request]
 def _api_request(date):
 	'''
+	Function to do the API request and do the processing on the
+	response required
+
+	Args:
+		- date
+	Returns:
+		- response json
 	'''
 	req = requests.get(config.EXCHANGE_RATES_API_URL.format(date=date))
 	req_json = req.json()
@@ -160,6 +204,16 @@ def _get_data_from_api(
 	dates, multithreading, multithreading_after, num_threads
 ):
 	'''
+	Function that gets the data from the API either using multithreading
+	and even wiuthout it.
+
+	Args:
+		- dates
+		- multitheading
+		- multithreading after
+		- num of threads
+	Returns:
+		- list of results
 	'''
 	results = []
 
@@ -203,6 +257,16 @@ def extract_data(
 	dates, multithreading, multithreading_after, num_threads
 ):
 	'''
+	Function to extract the data from the API, do the required
+	preprocessing and return a frame with the target response.
+
+	Args:
+		- dates
+		- multithreading
+		- multithreading_after
+		- num_threads
+	Returns:
+		- final dataframe
 	'''
 	# Collect data
 	results = _get_data_from_api(
@@ -249,9 +313,20 @@ def extract_data(
 # [END]
 
 
+### Functions and classes for getting data from API END
+
+### Functions to do the database setup and persist START
+
+
 # [START Function to persist data into the database]
 def persist_data(df):
 	'''
+	Function to persist the data into the database.
+
+	Args:
+		- dataframe
+	Returns:
+		-
 	'''
 	session = DBSession()
 
@@ -277,3 +352,6 @@ def persist_data(df):
 
 	return
 # [END]
+
+
+### Functions to do the database setup and persist END
