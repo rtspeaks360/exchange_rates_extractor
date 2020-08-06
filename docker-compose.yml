@@ -12,6 +12,7 @@ services:
       - 'DATABASE_USER=rish'
       - 'DATABASE_PASSWORD=password'
       - 'MYSQL_ROOT_PASSWORD=password'
+      - 'DOCKER=True'
   db:
     image: mysql:latest
     environment:

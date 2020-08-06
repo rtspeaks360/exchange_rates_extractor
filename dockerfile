@@ -10,4 +10,4 @@ RUN pip install -r requirements.txt
 COPY . /usr/src/app
 
 ENTRYPOINT ["python"]
-CMD ["main.py", "--run_as", "dashboard"]
+CMD ["main.py", "--run_as", "dashboard", "--env", "prod"]

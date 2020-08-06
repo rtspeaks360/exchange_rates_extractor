@@ -10,6 +10,7 @@ import sys
 import requests
 import pandas as pd
 import numpy as np
+import mysql.connector as db_connector
 from datetime import datetime, date, timedelta
 from queue import Queue
 from threading import Thread
@@ -354,4 +355,34 @@ def persist_data(df):
 # [END]
 
 
+# [START Function to initialize the database]
+def initdb():
+	'''
+	Function to initialize the database and create the database tables
+
+	Args:
+		-
+	Returns:
+		-
+	'''
+
+	query = 'CREATE DATABASE IF NOT EXISTS pd_exchangerates;'
+
+	conn = db_connector.connect(
+		host = config.HOST, user=config.USER_NAME,
+		password=config.PASSWORD, database=config.DATABASE,
+		port=config.PORT
+	)
+	cursor = conn.cursor()
+	cursor.execute(query)
+	conn.commit()
+	conn.close()
+	logger.info('Created database if didn\'t exist')
+
+	models.convert_classes_into_tables(config.DB_CONN_STRING)
+	logger.info('Mapped sqlalchemy models into databae tables')
+
+	return
+
+# [END]
 ### Functions to do the database setup and persist END

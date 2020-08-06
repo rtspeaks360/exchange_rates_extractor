@@ -71,11 +71,13 @@ def main(args):
 			args.multithreading_after
 		)
 	elif args.run_as == 'dashboard':
+		if os.environ.__contains__('DOCKER') and os.environ['DOCKER'] == True:
+			er_extractor.utils.initdb()
 		logging.info('Running application as extractor process')
 		logger.info('')
 		app.run(host='0.0.0.0', port=8000)
 	elif args.initdb:
-		er_extractor.utils.models.convert_classes_into_tables(config.DB_CONN_STRING)
+		er_extractor.utils.initdb()
 	else:
 		logger.warning('Invalid `run_as` argument.')
 

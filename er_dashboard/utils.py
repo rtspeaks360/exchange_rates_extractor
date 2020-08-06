@@ -23,6 +23,13 @@ DBSession = sessionmaker(bind=engine)
 # [START Function to get the csv string for dashboard]
 def get_er_csv_string():
 	'''
+	Function to get the overall exchange rates, and convert
+	them into csv string for Dygraph plot.
+	
+	Args:
+		-
+	Returns:
+		- graph data csv string
 	'''
 	session = DBSession()
 	query = session.query(models.ExchangeRate).all()
