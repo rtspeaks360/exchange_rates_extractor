@@ -1,5 +1,6 @@
 ### Imports START
 import logging
+import os
 from flask import Flask, render_template, jsonify
 
 from er_dashboard import utils
@@ -26,3 +27,8 @@ def index():
 @app.route("/status")
 def status_check():
 	return jsonify(status='200')
+
+@app.route("/environment")
+def get_environment_variables():
+	print(os.environ)
+	return jsonify(environ=str(os.environ))

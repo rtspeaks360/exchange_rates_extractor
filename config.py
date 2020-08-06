@@ -22,12 +22,12 @@ if os.environ.keys().__contains__('ENV-INDICATOR') \
 	# Environment string
 	env_str = 'PROD'
 	BASE_PATH = os.environ['SCPATH']
-
-	USER_NAME = ''
-	PASSWORD = ''
-	HOST = ''
-	PORT = ''
-	DATABASE = 'pd_exchangerates'
+	if os.environ.keys().__contains__('HOSTNAME')
+		USER_NAME = os.environ['DATABASE_USER']
+		PASSWORD = os.environ['DATABASE_PASSWORD']
+		HOST = os.environ['HOSTNAME']
+		PORT = 3306
+		DATABASE = os.environ['DATABASE_NAME']
 else:
 	# Environment string
 	env_str = 'DEV'
