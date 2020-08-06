@@ -3,24 +3,69 @@
 <head>
 	<title>Exchange rates explorer dashboard</title>
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dygraph.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='site.css') }}">
 	<script type="text/javascript" src="{{ url_for('static', filename='js/dygraph.min.js') }}"></script>
 </head>
-<body>
-	<p>Hello there this is your explorer dahsboard.</p>
-	<div id="graphdiv">
-		<script type="text/javascript">
-		g = new Dygraph(
-			document.getElementById("graphdiv"),
-			"{{ graph_data }}",
-			{
-				legend: 'always',
-				title: 'Euro vs usd',
-				customBars: false,
-				xlabel: 'Date',
-				ylabel: 'Rates usd'
+<body >
+	<div id="header" class="navbar navbar-fixed-top">
+		<div class="container">
+			<h1 class="navbar-brand"><a href="/">Exchange rates</a></h1>
+		</div>
+    </div>
+    <div class="container" id="main" style="padding-top: 100px ">
+    	<div class="row align-items-center" >
+    		<div class="col-lg-1"></div>
+    		<div class="col-lg-10">
+    			<h4>For the bonus tasks mentioned in the data engineering challenge, following is the graph that demonstates the recorded rates.</h4>
+    		</div>
+    	</div>
+    	<div class="row" style="margin-top: 25px; margin-bottom: 35px">
+    		<div class="col-lg-3"></div>
+      		<div class="col-lg-6" >
+				<div id="graphdiv">
+					<script type="text/javascript">
+					g = new Dygraph(
+						document.getElementById("graphdiv"),
+						"{{ graph_data }}",
+						{
+							legend: 'always',
+							title: 'EUR vs USD over time',
+							customBars: false,
+							xlabel: 'Date',
+							ylabel: 'Rates usd'
+						}
+					);
+				</script>
+				</div>
+			</div>
+			<div class="col-lg-3"></div>
+		</div>
+		<div class="row">
+    		<div class="col-lg-1"></div>
+    		<div class="col-lg-10">
+    						<p style="text-align: justify-all;">The chart is <i>interactive</i>: you can mouse over to highlight individual values. You can click and drag to zoom. Double-clicking will zoom you back out. Shift-drag will pan. You can change the number and hit enter to adjust the averaging period.</p>
+
+    						<p>If you don't see any data on the graph then it probably means you don't have any data in your MySql database. Try running the process in extractor mode to get the data. Data collection for the entire 20 years period takes about <i>5 mins</i>, if you have multithreading enabled.</p>
+		</div>
+    		</div>
+    	</div>
+		<div class="row">
+		<footer class="footer">
+			<div class="container" style="align-content: center;">&#169;Designed with &#9829; by Rishabh Thukral</div>
+		</footer>
+
+		<style>
+			.footer {
+			  position: fixed;
+			  left: 0;
+			  bottom: 0;
+			  width: 100%;
+			  color: black;
+			  text-align: center;
 			}
-		);
-	</script>
+		</style>
+			
 	</div>
 </body>
 </html>
