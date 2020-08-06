@@ -1,6 +1,6 @@
 ### Imports START
 import logging
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 
 from er_dashboard import utils
 ### Imports END
@@ -22,3 +22,7 @@ def server_error(e):
 def index():
 	graph_data = utils.get_er_csv_string()
 	return render_template('dashboard.html', graph_data=graph_data)
+
+@app.route("/status")
+def status_check():
+	return jsonify(status='200')
