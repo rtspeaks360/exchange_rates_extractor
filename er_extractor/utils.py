@@ -2,7 +2,7 @@
 # @Author: rish
 # @Date:   2020-08-02 23:03:47
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-05 03:12:37
+# @Last Modified time: 2020-08-10 12:35:20
 
 ### Imports START
 import logging
@@ -369,8 +369,8 @@ def initdb():
 	query = 'CREATE DATABASE IF NOT EXISTS pd_exchangerates;'
 
 	conn = db_connector.connect(
-		host = config.HOST, user=config.USER_NAME,
-		password=config.PASSWORD, database=config.DATABASE,
+		host=config.HOST, user=config.USER_NAME,
+		password=config.PASSWORD,
 		port=config.PORT
 	)
 	cursor = conn.cursor()

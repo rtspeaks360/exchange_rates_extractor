@@ -1,7 +1,5 @@
 ### Import START
-import io
 import logging
-import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -25,7 +23,7 @@ def get_er_csv_string():
 	'''
 	Function to get the overall exchange rates, and convert
 	them into csv string for Dygraph plot.
-	
+
 	Args:
 		-
 	Returns:
@@ -35,16 +33,14 @@ def get_er_csv_string():
 	query = session.query(models.ExchangeRate).all()
 
 	graph_data = ''
-	
-	if len(query) > 0: 
+
+	if len(query) > 0:
 		rates = [_.serialize_usd_rate for _ in query]
-		rates_df = pd.DataFrame(rates)
 
 		graph_data = graph_data + 'Date,USD\\n'
 		for _ in rates:
 			graph_data = (
-				graph_data 
-				+'{},{}\\n'
+				graph_data + '{},{}\\n'
 				.format(_['date'], _['usd'])
 			)
 	return graph_data

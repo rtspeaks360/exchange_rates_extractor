@@ -2,7 +2,7 @@
 # @Author: rish
 # @Date:   2020-08-04 00:16:57
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-05 00:59:51
+# @Last Modified time: 2020-08-10 12:14:31
 
 ### Imports START
 import os
@@ -10,7 +10,6 @@ import sys
 import time
 import logging
 
-import config
 import parser
 ### Imports END
 
@@ -27,6 +26,7 @@ script_path = script_name[:-8]
 
 # Get arguments received
 args = parser.parser_args()
+FIRST = True
 
 
 if args.env == 'prod':
@@ -35,14 +35,15 @@ if args.env == 'prod':
 	os.environ['SCPATH'] = script_path
 
 	# Activate virtual environment with installed dependencies
-	activate_this = script_path + 'env/bin/activate_this.py'
-	with open(activate_this) as file_:
-		exec(file_.read(), dict(__file__=activate_this))
+	# activate_this = script_path + 'env/bin/activate_this.py'
+	# with open(activate_this) as file_:
+	# 	exec(file_.read(), dict(__file__=activate_this))
 
 	# Use project directory
 	sys.path.insert(0, script_path)
 else:
 	os.environ['ENV-INDICATOR'] = 'DEV'
+	os.environ['SCPATH'] = script_path
 
 
 from er_extractor import core as er_extractor
@@ -60,7 +61,7 @@ def main(args):
 	Returns:
 		-
 	'''
-
+	global FIRST
 	if args.run_as == 'extractor':
 		logger.info('Running application as extractor process')
 		logger.info('')
@@ -70,12 +71,20 @@ def main(args):
 			args.num_of_threads, args.multithreading,
 			args.multithreading_after
 		)
+
 	elif args.run_as == 'dashboard':
-		if os.environ.__contains__('DOCKER') and os.environ['DOCKER'] == True:
+		if os.environ.__contains__('DOCKER')\
+			and os.environ['DOCKER'] == 'True'\
+			and FIRST is True:
+			logger.info('Waiting for DB Container to initialize.')
+			time.sleep(2)
+			logger.info('Setting up schema')
 			er_extractor.utils.initdb()
+			FIRST = False
 		logging.info('Running application as extractor process')
 		logger.info('')
 		app.run(host='0.0.0.0', port=8000)
+
 	elif args.initdb:
 		er_extractor.utils.initdb()
 	else:

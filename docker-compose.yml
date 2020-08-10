@@ -9,11 +9,12 @@ services:
     environment:
       - 'DATABASE_HOST=db'
       - 'DATABASE_NAME=pd_exchangerates'
-      - 'DATABASE_USER=rish'
+      - 'DATABASE_USER=root'
       - 'DATABASE_PASSWORD=password'
-      - 'MYSQL_ROOT_PASSWORD=password'
       - 'DOCKER=True'
   db:
     image: mysql:latest
     environment:
       - 'MYSQL_ROOT_PASSWORD=password'
+    ports:
+      - '8005:3306'
