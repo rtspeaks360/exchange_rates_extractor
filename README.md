@@ -1,8 +1,7 @@
 # Plus Dental Data Engineering challenge
-The exchange rate extractor repository, contains an extractor that gets the exchange rates data based on arguments and a flask application that acts as a dashboard to visualise the data collected.
-
 This is the solution repository for my PlusDental data engineering challenge. Here I have designed a command line application that can be run in two modes using the `run_as` argument - the api extractor tool and the dashboard applicatiion to visualize and explore the data collected.
 
+The solution is also served using the functionality in two modules - `er_extractor` for the extractor applicatoon and `er_dashboard` for the dashboard application.
 
 
 ## Instructions for using the solution application
@@ -59,3 +58,7 @@ Once you have the data retrieved, your dashboard should have the latest data if 
 
 
 <img src="https://raw.githubusercontent.com/rtspeaks360/exchange_rates_extractor/documentation/ss/example%20dashboard.png">
+
+
+### Note on extractor:
+All the points / feature requests for the extractor proicess can be handled / served using the 4 options for the subargument `get_data_by`. Any further enhancements can be made on top of the existing solution.
