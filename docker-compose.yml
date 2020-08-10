@@ -1,0 +1,20 @@
+version: '3'
+services:
+  web:
+    build: .
+    links:
+       - 'db'
+    ports:
+      - '8000:8000'
+    environment:
+      - 'DATABASE_HOST=db'
+      - 'DATABASE_NAME=pd_exchangerates'
+      - 'DATABASE_USER=root'
+      - 'DATABASE_PASSWORD=password'
+      - 'DOCKER=True'
+  db:
+    image: mysql:latest
+    environment:
+      - 'MYSQL_ROOT_PASSWORD=password'
+    ports:
+      - '8005:3306'

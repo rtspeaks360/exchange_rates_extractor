@@ -2,7 +2,7 @@
 # @Author: rish
 # @Date:   2020-08-04 00:17:37
 # @Last Modified by:   rish
-# @Last Modified time: 2020-08-04 21:38:28
+# @Last Modified time: 2020-08-10 12:31:55
 
 
 ### Imports START
@@ -17,17 +17,16 @@ LATEST_LOWER_BOUND = 7
 EXCHANGE_RATES_API_URL = 'https://api.exchangeratesapi.io/{date}'
 CURRENCY_MARKERS = ['USD', 'CAD', 'INR', 'SGD', 'RUB', 'CZK', 'ISK', 'HKD']
 
-if os.environ.keys().__contains__('ENV-INDICATOR') \
-	and os.environ['ENV-INDICATOR'] == 'PROD':
-	# Environment string
-	env_str = 'PROD'
+if os.environ.keys().__contains__('DOCKER') \
+	and os.environ['DOCKER'] == 'True':
+	env_str = 'DOCKER'
 	BASE_PATH = os.environ['SCPATH']
 
-	USER_NAME = ''
-	PASSWORD = ''
-	HOST = ''
-	PORT = ''
-	DATABASE = 'pd_exchangerates'
+	USER_NAME = os.environ['DATABASE_USER']
+	PASSWORD = os.environ['DATABASE_PASSWORD']
+	HOST = os.environ['DATABASE_HOST']
+	PORT = 3306
+	DATABASE = os.environ['DATABASE_NAME']
 else:
 	# Environment string
 	env_str = 'DEV'
